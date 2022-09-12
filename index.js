@@ -1,11 +1,21 @@
 const genshindb = require('genshin-db');
+const http = require('http');
+const https = require('https');
 const express = require('express')
 const cors = require('cors')
+const fs = require("fs");
+
+
+
 const app = express()
 app.use(cors())
 const port = 3000
 
-
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer({
+  key: fs.readFileSync("private.key"),
+  cert: fs.readFileSync("certificate.crt"),
+}, app);
 
 genshindb.setOptions({
   queryLanguages: ["Portuguese"],
@@ -33,6 +43,11 @@ app.get('*', (req, res) => {
     '/character/:name': 'Procura por 1 personagem'
   })
 })
-app.listen(port, () => {
-  console.log(`App rodando na porta: ${port}`)
+
+
+httpServer.listen(3001, () => {
+  console.log(`Http rodando na porta: ${3001}`)
+})
+httpsServer.listen(3000, () => {
+  console.log(`Https rodando na porta: ${3000}`)
 })

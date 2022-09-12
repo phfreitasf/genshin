@@ -44,3 +44,5 @@ Thumbs.db
 # Personalizado
 .env
 src/environments/environment.ts
+certificate.crt
+private.key

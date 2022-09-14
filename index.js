@@ -1,15 +1,18 @@
-const genshindb = require('genshin-db');
+
 const http = require('http');
 const https = require('https');
+const fs = require("fs");
+
 const express = require('express')
 const cors = require('cors')
-const fs = require("fs");
+
+const character_controller = require('./controller/characters');
+const talentMaterial_controller = require('./controller/talentMaterial');
 
 
 
 const app = express()
 app.use(cors())
-const port = 3000
 
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer({
@@ -17,32 +20,23 @@ var httpsServer = https.createServer({
   cert: fs.readFileSync("certificate.crt"),
 }, app);
 
-genshindb.setOptions({
-  queryLanguages: ["Portuguese"],
-  resultLanguage: "Portuguese",
-  matchAliases: true,
-  verboseCategories: true
-})
+// Rotas personagens
+app.get('/character', character_controller.character)
+app.get('/character/:name', character_controller.character_single)
 
-app.get('/character', (req, res) => {
-  res.send(genshindb.characters('names', {
-    matchCategories: true
-  }))
-})
+// Rotas materiais ascensão
+app.get('/ascend/:material',talentMaterial_controller.material)
 
-app.get('/character/:name', (req, res) => {
-  console.log(`Alguem pesquisou: ${req.params.name}`)
-  res.send(genshindb.characters(req.params.name, {
-    matchCategories: true
-  }))
-})
-
+// Rota que retorna as rotas existentes
 app.get('*', (req, res) => {
   res.send({
     '/character': 'Exibe todos os personagens',
-    '/character/:name': 'Procura por 1 personagem'
+    '/character/:name': 'Procura por 1 personagem',
+    '/ascend/:material' : 'Procura por material de ascensão'
   })
 })
+
+
 
 
 httpServer.listen(3001, () => {
